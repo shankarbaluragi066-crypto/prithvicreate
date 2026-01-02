@@ -8,7 +8,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        #root:empty::after {
+            content: 'Loading High-Performance Experience...';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-weight: 800;
+            color: #2563eb;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+        }
+        
+        /* Rich Text Styling Presets */
+        .rich-content ul { list-style-type: disc !important; padding-left: 1.5rem !important; margin-bottom: 1.25rem; }
+        .rich-content ol { list-style-type: decimal !important; padding-left: 1.5rem !important; margin-bottom: 1.25rem; }
+        .rich-content li { margin-bottom: 0.5rem; }
+        .rich-content p { margin-bottom: 1rem; }
+        .rich-content b, .rich-content strong { font-weight: 800; color: #0f172a; }
+        .rich-content i, .rich-content em { font-style: italic; }
     </style>
 <script type="importmap">
 {
@@ -23,6 +42,14 @@
 </script>
 </head>
 <body class="bg-slate-50 text-slate-900">
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+        <h1>JavaScript Disabled</h1>
+        <p>This marketplace requires JavaScript to handle secure bookings and media previews. Please enable it to continue.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
+    <!-- Explicitly link index.tsx for outside hosting compatibility -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>

@@ -101,9 +101,10 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ store }) => {
 
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Gig Overview</h2>
-            <div className="text-slate-600 leading-relaxed text-lg space-y-6 whitespace-pre-line">
-              {service.description}
-            </div>
+            <div 
+              className="text-slate-600 leading-relaxed text-lg rich-content"
+              dangerouslySetInnerHTML={{ __html: service.description }}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -185,7 +186,7 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ store }) => {
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-red-500 font-bold text-[10px] bg-red-50 px-2 py-1 rounded">PDF</span>
-                        <span className="text-xs font-bold text-slate-700 truncate max-w-[10rem]">Asset_{idx+1}.pdf</span>
+                        <span className="text-xs font-bold text-slate-700 truncate max-w-[12rem]">Asset_{idx+1}.pdf</span>
                       </div>
                       <svg className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeWidth="2"/></svg>
                     </a>

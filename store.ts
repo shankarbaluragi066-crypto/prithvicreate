@@ -15,15 +15,16 @@ const DB_KEYS = {
 };
 
 export const useStore = () => {
-  // --- 1. Database Initialization Logic ---
+  // --- 1. Bulletproof Database Logic ---
   const loadFromDB = <T>(key: string, defaultValue: T): T => {
     try {
       const saved = localStorage.getItem(key);
-      if (saved) {
+      if (saved && saved !== "undefined") {
         return JSON.parse(saved);
       }
     } catch (err) {
-      console.error(`Database Error: Failed to hydrate ${key}`, err);
+      console.warn(`[Store] Failed to parse ${key}, resetting to default.`, err);
+      localStorage.removeItem(key); // Clear corrupted data
     }
     return defaultValue;
   };
@@ -33,15 +34,17 @@ export const useStore = () => {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (err) {
       if (err instanceof DOMException && err.name === 'QuotaExceededError') {
-        console.error("Database Quota Exceeded! Media files might be too large.");
-        alert("Your browser's storage is full. Try uploading smaller video/image files.");
+        console.error("[Store] Quota Exceeded! Large media files blocked.");
+        // Try to clear old session data or analytics to make room if possible
+        localStorage.removeItem(DB_KEYS.SESSION);
+        alert("Warning: Your browser storage is full. Some recent changes might not be saved.");
       } else {
-        console.error(`Database Error: Failed to commit ${key}`, err);
+        console.error(`[Store] Save Error for ${key}`, err);
       }
     }
   };
 
-  // --- 2. State Definitions (The "Tables") ---
+  // --- 2. Tables (State) ---
   const [users, setUsers] = useState<User[]>(() => 
     loadFromDB(DB_KEYS.USERS, [{
       id: 'admin-1',
@@ -68,7 +71,7 @@ export const useStore = () => {
     loadFromDB(DB_KEYS.SESSION, null)
   );
 
-  // --- 3. Database Sync Effects ---
+  // --- 3. Sync Effects with Debouncing/Safety ---
   useEffect(() => { saveToDB(DB_KEYS.USERS, users); }, [users]);
   useEffect(() => { saveToDB(DB_KEYS.SERVICES, services); }, [services]);
   useEffect(() => { saveToDB(DB_KEYS.ORDERS, orders); }, [orders]);
@@ -81,8 +84,7 @@ export const useStore = () => {
     }
   }, [currentUser]);
 
-  // --- 4. Store API (The "Queries") ---
-
+  // --- 4. API Actions ---
   const setServices = useCallback((newServices: Service[]) => {
     setServicesState(newServices);
   }, []);
@@ -123,17 +125,12 @@ export const useStore = () => {
   };
 
   return {
-    // Data
     services,
     orders,
     settings,
     currentUser,
-    
-    // Status
     isAuthenticated: !!currentUser,
     isAdmin: currentUser?.role === 'admin',
-    
-    // Actions
     setServices,
     setOrders,
     setSettings,

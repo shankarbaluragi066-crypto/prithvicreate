@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { MOCK_ANALYTICS } from '../constants';
@@ -15,6 +15,70 @@ const isVideoMedia = (url: string) => {
          url.toLowerCase().endsWith('.mp4') || 
          url.toLowerCase().endsWith('.webm') || 
          url.toLowerCase().endsWith('.mov');
+};
+
+/**
+ * RichTextEditor Component
+ * Custom lightweight implementation using contentEditable
+ */
+const RichTextEditor = ({ value, onChange }: { value: string, onChange: (val: string) => void }) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value || '';
+    }
+  }, [value]);
+
+  const handleCommand = (command: string) => {
+    document.execCommand(command, false);
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  return (
+    <div className="border border-slate-200 rounded-[2rem] overflow-hidden bg-slate-50 focus-within:bg-white focus-within:border-blue-600 transition-all shadow-inner group">
+      <div className="flex gap-1 p-3 border-b border-slate-100 bg-white/80 sticky top-0 z-10 backdrop-blur-sm">
+        <button 
+          type="button" 
+          onClick={() => handleCommand('bold')} 
+          title="Bold"
+          className="w-10 h-10 rounded-xl hover:bg-slate-100 font-black flex items-center justify-center text-sm border border-transparent hover:border-slate-200 transition active:scale-95"
+        >B</button>
+        <button 
+          type="button" 
+          onClick={() => handleCommand('italic')} 
+          title="Italic"
+          className="w-10 h-10 rounded-xl hover:bg-slate-100 italic flex items-center justify-center text-sm border border-transparent hover:border-slate-200 transition active:scale-95"
+        >I</button>
+        <div className="w-[1px] h-6 bg-slate-200 my-auto mx-1"></div>
+        <button 
+          type="button" 
+          onClick={() => handleCommand('insertUnorderedList')} 
+          title="Bullet List"
+          className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center transition active:scale-95 border border-transparent hover:border-slate-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <button 
+          type="button" 
+          onClick={() => handleCommand('insertOrderedList')} 
+          title="Numbered List"
+          className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center transition active:scale-95 border border-transparent hover:border-slate-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4m0 0l4-4m-4 4h18" /></svg>
+        </button>
+      </div>
+      <div 
+        ref={editorRef}
+        contentEditable
+        onInput={(e) => onChange(e.currentTarget.innerHTML)}
+        onBlur={(e) => onChange(e.currentTarget.innerHTML)}
+        className="px-8 py-6 outline-none min-h-[16rem] prose prose-slate max-w-none bg-transparent rich-content"
+      />
+    </div>
+  );
 };
 
 const StatCard = ({ title, value, change, color }: { title: string, value: any, change: string, color: string }) => (
@@ -318,8 +382,11 @@ const ServicesManagement = ({ store }: { store: any }) => {
                         </select>
                       </div>
                       <div className="col-span-2">
-                        <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Gig Description</label>
-                        <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Explain what your service includes..." className="w-full px-6 py-5 rounded-3xl border border-slate-200 outline-none h-48 resize-none bg-slate-50 focus:bg-white transition" />
+                        <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Gig Description (Rich Text)</label>
+                        <RichTextEditor 
+                          value={formData.description || ''} 
+                          onChange={val => setFormData({...formData, description: val})} 
+                        />
                       </div>
                     </div>
                   </div>
