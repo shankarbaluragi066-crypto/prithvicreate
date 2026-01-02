@@ -1,0 +1,8 @@
+{
+  "name": "Prithvi Creation Freelance Marketplace",
+  "description": "A professional freelancing service booking platform for YouTubers and brands, featuring a full CMS, service management, order tracking, and high-performance analytics dashboard.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
